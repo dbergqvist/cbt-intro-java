@@ -49,7 +49,6 @@ public class Codelab {
           .split(",");
 
   public static void main(String[] args) {
-    // Consult system properties to get project/instance
     String projectId = "bigtable.projectID";
     String instanceId = "bigtable.instanceID";
     String table = "bigtable.table";
