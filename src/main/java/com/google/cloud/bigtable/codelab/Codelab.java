@@ -48,6 +48,16 @@ public class Codelab {
               + "M34-SBS,M60-SBS,M79-SBS,M86-SBS")
           .split(",");
 
+  public static void main(String[] args) {
+    // Consult system properties to get project/instance
+    String projectId = "bigtable.projectID";
+    String instanceId = "bigtable.instanceID";
+    String table = "bigtable.table";
+    String query = "query";
+
+    runQuery(projectId, instanceId, table, query);
+  }
+
   /** Connects to Cloud Bigtable, runs a query and prints the results. */
   private static void runQuery(
       String projectId, String instanceId, String tableName, String query) {
@@ -218,16 +228,6 @@ public class Codelab {
       System.out.print(",");
       System.out.println(Bytes.toString(raw[i + raw.length / 2].getValueArray()));
     }
-  }
-
-  public static void main(String[] args) {
-    // Consult system properties to get project/instance
-    String projectId = requiredProperty("bigtable.projectID");
-    String instanceId = requiredProperty("bigtable.instanceID");
-    String table = requiredProperty("bigtable.table");
-    String query = requiredProperty("query");
-
-    runQuery(projectId, instanceId, table, query);
   }
 
   private static String requiredProperty(String prop) {
