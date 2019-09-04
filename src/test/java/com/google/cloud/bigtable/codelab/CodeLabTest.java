@@ -161,9 +161,35 @@ public class CodeLabTest {
 
     System.out.println("Scan for all m86 heading West during the month:");
     ResultScanner scanner = table.getScanner(scan);
+    StringBuilder buffer = new StringBuilder();
     for (Result row : scanner) {
-      printLatLongPairs(row);
+      buffer.append(printLatLongPairs(row));
     }
+
+    Filters.ChainFilter chain = FILTERS
+        .chain()
+        .filter(FILTERS.limit().cellsPerColumn(1))
+        .filter(FILTERS.condition(
+            FILTERS.chain()
+                .filter(FILTERS.limit().cellsPerColumn(1))
+                .filter(FILTERS.qualifier().exactMatch("DestinationName"))
+                .filter(FILTERS.value().exactMatch("Select Bus Service Westside West End AV")))
+            .then(FILTERS
+                .interleave()
+                .filter(FILTERS.qualifier().exactMatch(LAT_COLUMN_NAME_STRING))
+                .filter(FILTERS.qualifier().exactMatch(LONG_COLUMN_NAME_STRING))));
+
+    Query query = Query.create(TABLE_ID)
+        .prefix("MTA/M86-SBS/")
+        .filter(chain);
+    ServerStream<Row> rows = dataClient.readRows(query);
+
+    StringBuilder buffer2 = new StringBuilder();
+    for (Row r : rows) {
+      buffer2.append(printLatLongPairs(r.getCells()));
+    }
+
+    Assert.assertEquals(buffer.toString(), buffer2.toString());
   }
 
   @Test
@@ -177,9 +203,26 @@ public class CodeLabTest {
         .setRowPrefixFilter(Bytes.toBytes("MTA/M86-SBS/1496275200000"));
     System.out.println("Scan for all M86 buses on June 1, 2017 from 12:00am to 1:00am:");
     ResultScanner scanner = table.getScanner(scan);
+
+    StringBuilder builder = new StringBuilder();
     for (Result row : scanner) {
-      printLatLongPairs(row);
+      builder.append(printLatLongPairs(row));
     }
+
+    Query query = Query.create(TABLE_ID)
+        .prefix("MTA/M86-SBS/1496275200000")
+        .filter(FILTERS
+            .interleave()
+            .filter(FILTERS.qualifier().exactMatch(LAT_COLUMN_NAME_STRING))
+            .filter(FILTERS.qualifier().exactMatch(LONG_COLUMN_NAME_STRING)));
+
+    StringBuilder builder2 = new StringBuilder();
+    ServerStream<Row> rows = dataClient.readRows(query);
+    for (Row r : rows) {
+      builder2.append(printLatLongPairs(r.getCells()));
+    }
+
+    Assert.assertEquals(builder.toString(), builder2.toString());
   }
 
   @Test
