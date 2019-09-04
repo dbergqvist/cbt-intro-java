@@ -237,9 +237,29 @@ public class CodeLabTest {
 
     System.out.println("Scan for all m86 during the month:");
     ResultScanner scanner = table.getScanner(scan);
+    StringBuilder builder = new StringBuilder();
     for (Result row : scanner) {
-      printLatLongPairs(row);
+      builder.append(printLatLongPairs(row));
     }
+
+    Query query = Query.create(TABLE_ID)
+        .prefix("MTA/M86-SBS/")
+        .filter(FILTERS
+            .chain()
+            .filter(FILTERS.limit().cellsPerColumn(1))
+            .filter(FILTERS
+                .interleave()
+                .filter(FILTERS.qualifier().exactMatch(LAT_COLUMN_NAME_STRING))
+                .filter(FILTERS.qualifier().exactMatch(LONG_COLUMN_NAME_STRING))));
+
+    ServerStream<Row> rows = dataClient.readRows(query);
+
+    StringBuilder builder2 = new StringBuilder();
+    for (Row r : rows) {
+      builder2.append(printLatLongPairs(r.getCells()));
+    }
+
+    Assert.assertEquals(builder.toString(), builder2.toString());
   }
 
   @Test
