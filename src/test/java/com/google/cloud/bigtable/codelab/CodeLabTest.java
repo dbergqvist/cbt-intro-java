@@ -110,9 +110,9 @@ public class CodeLabTest {
 
     System.out.println("Scan for all m86 heading East during the month:");
     ResultScanner scanner = table.getScanner(scan);
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for (Result row : scanner) {
-      buffer = buffer.append(printLatLongPairs(row));
+      buffer.append(printLatLongPairs(row));
     }
 
     Filters.ChainFilter chain = FILTERS
@@ -133,9 +133,9 @@ public class CodeLabTest {
         .filter(chain);
     ServerStream<Row> rows = dataClient.readRows(query);
 
-    StringBuffer buffer2 = new StringBuffer();
+    StringBuilder buffer2 = new StringBuilder();
     for (Row r : rows) {
-      buffer2 = buffer2.append(printLatLongPairs(r.getCells()));
+      buffer2.append(printLatLongPairs(r.getCells()));
     }
 
     Assert.assertEquals(buffer.toString(), buffer2.toString());
