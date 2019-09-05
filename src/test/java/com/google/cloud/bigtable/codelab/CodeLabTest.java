@@ -285,9 +285,31 @@ public class CodeLabTest {
 
     System.out.println("Scan for all buses on June 1, 2017 from 12:00am to 1:00am:");
     ResultScanner scanner = table.getScanner(scan);
+
+    StringBuilder builder = new StringBuilder();
     for (Result row : scanner) {
-      printLatLongPairs(row);
+      builder.append(printLatLongPairs(row));
     }
+
+    Query query = Query.create(TABLE_ID);
+
+    for (String busLine : MANHATTAN_BUS_LINES) {
+      query.range("MTA/" + busLine + "/1496275200000", "MTA/" + busLine + "/1496275200001");
+    }
+
+    query.filter(FILTERS
+        .interleave()
+        .filter(FILTERS.qualifier().exactMatch(LAT_COLUMN_NAME_STRING))
+        .filter(FILTERS.qualifier().exactMatch(LONG_COLUMN_NAME_STRING)));
+
+    ServerStream<Row> rows = dataClient.readRows(query);
+
+    StringBuilder builder2 = new StringBuilder();
+      for (Row r : rows) {
+        builder2.append(printLatLongPairs(r.getCells()));
+    }
+
+    Assert.assertEquals(builder.toString(), builder2.toString());
   }
 
   private static StringBuffer printLatLongPairs(Result result) {
