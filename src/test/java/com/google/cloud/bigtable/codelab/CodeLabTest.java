@@ -71,6 +71,7 @@ public class CodeLabTest {
   public void lookupVehicleInGivenHour() throws IOException {
     String rowKey = "MTA/M86-SBS/1496275200000/NYCT_5824";
     Table table = connection.getTable(TableName.valueOf(TABLE_ID));
+    //exercise 7
     Result getResult =
         table.get(
             new Get(Bytes.toBytes(rowKey))
@@ -81,6 +82,7 @@ public class CodeLabTest {
         "Lookup a specific vehicle on the M86 route on June 1, 2017 from 12:00am to 1:00am:");
     StringBuffer builder = printLatLongPairs(getResult);
 
+    //google-cloud-bigtable
     Filters.ChainFilter filter = FILTERS.chain().filter(
         FILTERS.interleave()
             .filter(FILTERS.qualifier().exactMatch(LAT_COLUMN_NAME_STRING))
@@ -94,6 +96,7 @@ public class CodeLabTest {
   @Test
   public void filterBusesGoingEast() throws IOException {
     Table table = connection.getTable(TableName.valueOf(TABLE_ID));
+    //exercise 9a
     Scan scan = new Scan();
     SingleColumnValueFilter valueFilter =
         new SingleColumnValueFilter(
@@ -115,6 +118,7 @@ public class CodeLabTest {
       buffer.append(printLatLongPairs(row));
     }
 
+    //google-cloud-bigtable
     Filters.ChainFilter chain = FILTERS
         .chain()
         .filter(FILTERS.limit().cellsPerColumn(1))
@@ -144,6 +148,8 @@ public class CodeLabTest {
   @Test
   public void filterBusesGoingWest() throws IOException {
     Table table = connection.getTable(TableName.valueOf(TABLE_ID));
+
+    // exercise 9b
     SingleColumnValueFilter valueFilter =
         new SingleColumnValueFilter(
             COLUMN_FAMILY_NAME,
@@ -166,6 +172,7 @@ public class CodeLabTest {
       buffer.append(printLatLongPairs(row));
     }
 
+    //google-cloud-bigtable
     Filters.ChainFilter chain = FILTERS
         .chain()
         .filter(FILTERS.limit().cellsPerColumn(1))
@@ -195,6 +202,7 @@ public class CodeLabTest {
   @Test
   public void scanBusLineInGivenHour() throws IOException {
     Table table = connection.getTable(TableName.valueOf(TABLE_ID));
+    // exercise 8
     Scan scan = new Scan();
     scan.setMaxVersions(Integer.MAX_VALUE)
         .addColumn(COLUMN_FAMILY_NAME, LAT_COLUMN_NAME)
@@ -209,6 +217,7 @@ public class CodeLabTest {
       builder.append(printLatLongPairs(row));
     }
 
+    //google-cloud-bigtable
     Query query = Query.create(TABLE_ID)
         .prefix("MTA/M86-SBS/1496275200000")
         .filter(FILTERS
@@ -228,6 +237,8 @@ public class CodeLabTest {
   @Test
   public void scanEntireBusLine() throws IOException {
     Table table = connection.getTable(TableName.valueOf(TABLE_ID));
+
+    //exercise 8b
     Scan scan = new Scan();
     scan.setMaxVersions(1)
         .addColumn(COLUMN_FAMILY_NAME, LAT_COLUMN_NAME)
@@ -242,6 +253,7 @@ public class CodeLabTest {
       builder.append(printLatLongPairs(row));
     }
 
+    //google-cloud-bigtable
     Query query = Query.create(TABLE_ID)
         .prefix("MTA/M86-SBS/")
         .filter(FILTERS
@@ -265,6 +277,7 @@ public class CodeLabTest {
   @Test
   public void scanManhattanBusesInGivenHour() throws IOException {
     Table table = connection.getTable(TableName.valueOf(TABLE_ID));
+    //exercise 10
     List<RowRange> ranges = new ArrayList<>();
 
     for (String busLine : MANHATTAN_BUS_LINES) {
@@ -291,6 +304,7 @@ public class CodeLabTest {
       builder.append(printLatLongPairs(row));
     }
 
+    //google-cloud-bigtable
     Query query = Query.create(TABLE_ID);
 
     for (String busLine : MANHATTAN_BUS_LINES) {
